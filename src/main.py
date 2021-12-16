@@ -3,12 +3,7 @@ import flask
 import storage
 
 
-def create_app():
-    app = flask.Flask(__name__)
-    return app
-
-
-app = create_app()
+app = flask.Flask(__name__)
 
 
 @app.route('/push/<metric_name>')

@@ -8,8 +8,8 @@ import settings
 
 
 class BaseStorage(abc.ABC):
-    @abc.abstractstaticmethod
     @staticmethod
+    @abc.abstractstaticmethod
     def store_metric(name: str, value: float, labels: t.Dict[str, str]) -> None:
         pass
 

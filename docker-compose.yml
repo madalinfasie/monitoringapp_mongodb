@@ -10,12 +10,20 @@ services:
       - ./src:/code
     command:
       flask run --host 0.0.0.0 --port 5000
+  celery_beat:
+    image: metrics:latest
+    env_file: ./src/.env
+    volumes:
+      - ./src:/code
+    command: ['celery', '-A', 'tasks.celery.app', beat, '-l', 'info']
+    depends_on:
+      - broker
   celery_worker:
     image: metrics:latest
     env_file: ./src/.env
     volumes:
       - ./src:/code
-    command: ['celery', '-A', 'tasks.celery.app', 'worker', '-l', 'info']
+    command: ['celery', '-A', 'tasks.celery.app', worker, '-l', 'info']
     depends_on:
       - broker
   broker:
