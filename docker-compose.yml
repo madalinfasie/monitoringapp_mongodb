@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  metrics_web:
+    build: ./src
+    image: metrics:latest
+    env_file: ./src/.env
+    ports:
+      - 5000:5000
+    volumes:
+      - ./src:/code
+    command:
+      flask run --host 0.0.0.0 --port 5000
+  celery_worker:
+    image: metrics:latest
+    env_file: ./src/.env
+    volumes:
+      - ./src:/code
+    command: ['celery', '-A', 'tasks.celery.app', 'worker', '-l', 'info']
+    depends_on:
+      - broker
+  broker:
+    image: redis:6.2.6
+    ports:
+      - 6379:6379
