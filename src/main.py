@@ -1,6 +1,6 @@
 import flask
 
-import storage
+from components import storage
 
 
 app = flask.Flask(__name__)

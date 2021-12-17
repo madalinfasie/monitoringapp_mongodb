@@ -1,4 +1,4 @@
-import metrics
+from components import metrics
 from tasks.celery import app
 
 

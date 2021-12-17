@@ -1,7 +1,7 @@
 import random
 import typing as t
 
-import storage
+from components import storage
 
 
 def collect_published_articles():
