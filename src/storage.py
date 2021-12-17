@@ -25,7 +25,11 @@ class MongoStorage(BaseStorage):
         timestamp = timestamp or datetime.now()
         with pymongo.MongoClient(settings.MONGO_URL) as client:
             db = client[settings.MONGO_DB_NAME]
-            db.create_collection(name, timeseries={'timeField': 'timestamp', 'metaField': 'labels'})
+            if name not in db.list_collection_names():
+                db.create_collection(
+                    name,
+                    timeseries={'timeField': 'timestamp', 'metaField': 'labels'})
+
             db[name].insert_one({
                 'timestamp': timestamp.isoformat(),
                 'labels': labels,
