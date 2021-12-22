@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 
 import settings
-from components.data_classes import Metric
+from data_classes import Metric
 
 
 class ModelDoesNotExistError(Exception):
@@ -53,7 +53,7 @@ class IForestModel(Model):
         model = self._load_model()
         return int(model.predict(df)[0])
 
-    def _build_model_path(self):
+    def _build_model_path(self) -> str:
         """ Build the path and the name of the model file """
         return '{metric_name}_{model_name}{labels}.joblib'.format(
             metric_name=self.metric.name,
@@ -63,7 +63,7 @@ class IForestModel(Model):
 
     def _split_timestamp_in_features(self,
             df: pd.DataFrame,
-            column: str = 'timestamp') -> None:
+            column: str = 'timestamp') -> pd.DataFrame:
         """ Split the time column from dataframe into separate features """
         df = df.copy()
         df[column] = pd.to_datetime(df[column])
@@ -75,7 +75,7 @@ class IForestModel(Model):
         df['is_weekday'] = [i.isoweekday() for i in df.index]
         return df
 
-    def _save_model(self, model) -> None:
+    def _save_model(self, model: IsolationForest) -> None:
         """ Save the given model into a file """
         models_path = pathlib.Path(settings.MODELS_PATH)
         if not models_path.exists():
@@ -83,7 +83,7 @@ class IForestModel(Model):
 
         joblib.dump(model, str(models_path / self._build_model_path()))
 
-    def _load_model(self):
+    def _load_model(self) -> IsolationForest:
         """ Load a previously saved model based on the metric attributes """
         models_path = pathlib.Path(settings.MODELS_PATH)
         try:

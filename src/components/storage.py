@@ -3,9 +3,9 @@ import typing as t
 from datetime import datetime
 
 import pymongo
-from bson.code import Code
 
 import settings
+import custom_types as types
 
 
 class BaseStorage(abc.ABC):
@@ -38,20 +38,18 @@ class MongoStorage(BaseStorage):
             'value': value
         })
 
-    def get_distinct_in_range(self, collection: str, start: datetime) -> t.Dict[str, t.Any]:
+    def get_distinct_in_range(self, collection: str, start: datetime) -> types.MongoDocsList:
         """ Select distinct labels starting from a given timestamp """
         return self.db[collection].distinct('labels', {'timestamp': {'$gte': start}})
 
     def get_metric_data(self,
             collection: str,
             start: datetime,
-            labels: t.Optional[t.Dict[str, str]] = None) -> t.Dict[str, t.Any]:
+            labels: t.Optional[t.Dict[str, str]] = None) -> types.MongoDocsList:
         """ Select documents starting from a `start` date optionally filtered by `labels` """
         find_params = {'timestamp': {'$gte': start}}
 
         if labels:
             find_params['labels'] = labels
-
-        print('findparams', find_params)
 
         return self.db[collection].find(find_params).sort([('timestamp', -1)])

@@ -22,7 +22,7 @@ def collect(collector: str, args=None, kwargs=None) -> None:
 
 
 @app.task
-def run_training():
+def run_training() -> None:
     detector = ad.Detector(ad_models.IForestModel)
     print('Starting metrics training')
     start = time.time()

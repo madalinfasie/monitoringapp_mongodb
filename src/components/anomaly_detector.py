@@ -5,8 +5,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 import settings
+import custom_types as types
 from components import storage, anomaly_models as ad_models
-from components.data_classes import Metric
+from data_classes import Metric
 
 
 class Detector:
@@ -41,7 +42,7 @@ class Detector:
                 metric.labels = labels
                 self._train_metric(metric)
 
-    def predict(self, metric_name, metric_obj: t.Dict[str, t.Any]) -> int:
+    def predict(self, metric_name: str, metric_obj: types.MongoDocument) -> int:
         """ Run predictions for all the metrics in the detection metrics file.
 
         Returns: -1 for outliers and 1 for inliers
