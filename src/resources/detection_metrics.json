@@ -1,11 +1,11 @@
 [
     {
         "name": "random_metric_with_prediction",
-        "train_params": {"n_estimators": 10},
+        "train_params": {"n_estimators": 20},
         "train_interval": {"days": 7}
     },
     {
-        "name": "published_articles_last_hour",
+        "name": "published_articles_last_15_mins",
         "train_params": {"n_estimators": 10},
         "train_interval": {"days": 7}
     }

@@ -33,11 +33,14 @@ class Detector:
                 collection=metric.name,
                 start=datetime.now() - timedelta(**metric.train_interval))
 
-            print(f'[TRAIN] Distinct labels for the metric {metric}: {distinct_labels}')
             if not distinct_labels:
                 self._train_metric(metric)
                 continue
 
+            distinct_labels = set([tuple(d.items()) for d in distinct_labels if 'anomaly' not in d])
+            distinct_labels = [dict(e) for e in distinct_labels]
+
+            print(f'[TRAIN] Distinct labels for the metric {metric}: {distinct_labels}')
             for labels in distinct_labels:
                 metric.labels = labels
                 self._train_metric(metric)

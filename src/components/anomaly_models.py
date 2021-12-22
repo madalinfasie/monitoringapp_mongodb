@@ -55,13 +55,10 @@ class IForestModel(Model):
 
     def _build_model_path(self) -> str:
         """ Build the path and the name of the model file """
-        labels = self.metric.labels.copy()
-        labels.pop('anomaly')
-
         return '{metric_name}_{model_name}{labels}.joblib'.format(
             metric_name=self.metric.name,
             model_name=self.model_name,
-            labels='_' + '_'.join(labels.values()) if self.metric.labels else ''
+            labels='_' + '_'.join(self.metric.labels.values()) if self.metric.labels else ''
         )
 
     def _split_timestamp_in_features(self,
