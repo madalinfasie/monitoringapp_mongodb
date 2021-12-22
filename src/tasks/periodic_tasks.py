@@ -10,12 +10,12 @@ SCHEDULES = {
     'collect_a_random_metric': {
         'task': 'tasks.tasks.collect',
         'kwargs': {'collector': 'collect_a_random_metric'},
-        'schedule': timedelta(seconds=15)
+        'schedule': timedelta(minutes=1)
     },
     'collect_a_random_metric_with_prediction': {
         'task': 'tasks.tasks.collect',
         'kwargs': {'collector': 'collect_a_random_metric_with_prediction'},
-        'schedule': timedelta(seconds=30)
+        'schedule': timedelta(minutes=5)
     },
     'collect_fresh_published_articles_devto': {
         'task': 'tasks.tasks.collect',
