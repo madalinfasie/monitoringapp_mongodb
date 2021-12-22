@@ -6,6 +6,13 @@ from components import storage
 app = flask.Flask(__name__)
 
 
+@app.route('/test')
+def test():
+    from tasks import tasks
+    tasks.run_training()
+    return 'Success'
+
+
 @app.route('/push', methods=['POST'])
 def push_metric():
     """ Push a metric from an external service to Mongo
