@@ -23,7 +23,7 @@ def _apply_prediction(
     """
     detector = ad.Detector()
     timestamp = timestamp or datetime.now()
-    metric_obj = {
+    metric_info = {
         'collection': name,
         'timestamp': timestamp,
         'value': value,
@@ -31,13 +31,13 @@ def _apply_prediction(
     }
 
     try:
-        metric_obj.setdefault('labels', {})['anomaly'] = detector.predict(
+        metric_info.setdefault('labels', {})['anomaly'] = detector.predict(
             metric_name=name,
-            metric_obj=metric_obj)
+            metric_info=metric_info)
     except ad_models.ModelDoesNotExistError:
         print(f'No model trained yet for metric {name}! Skipping predictions.')
 
-    return metric_obj
+    return metric_info
 
 
 def collect_a_random_metric() -> None:
@@ -55,18 +55,18 @@ def collect_a_random_metric_with_prediction() -> None:
     value2 = random.randrange(1, 100)
     metric_storage = storage.MongoStorage()
 
-    metric_obj1 = _apply_prediction(
+    metric_info1 = _apply_prediction(
         name='random_metric_with_prediction',
         value=value1,
         labels={'user': 'ion'})
 
-    metric_obj2 = _apply_prediction(
+    metric_info2 = _apply_prediction(
         name='random_metric_with_prediction',
         value=value2,
         labels={'user': 'maria'})
 
-    metric_storage.store_metric(**metric_obj1)
-    metric_storage.store_metric(**metric_obj2)
+    metric_storage.store_metric(**metric_info1)
+    metric_storage.store_metric(**metric_info2)
 
 
 def collect_fresh_published_articles_devto() -> None:
@@ -82,8 +82,8 @@ def collect_fresh_published_articles_devto() -> None:
         if obj['published_at'] > (datetime.now() - timedelta(hours=1)).isoformat()])
 
     # Run predictions and store the metric value
-    metric_obj = _apply_prediction(
+    metric_info = _apply_prediction(
         name='published_articles_last_hour',
         value=articles_last_hour)
 
-    metric_storage.store_metric(**metric_obj)
+    metric_storage.store_metric(**metric_info)

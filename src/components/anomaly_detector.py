@@ -42,15 +42,15 @@ class Detector:
                 metric.labels = labels
                 self._train_metric(metric)
 
-    def predict(self, metric_name: str, metric_obj: types.MongoDocument) -> int:
+    def predict(self, metric_name: str, metric_info: types.MongoDocument) -> int:
         """ Run predictions for all the metrics in the detection metrics file.
 
         Returns: -1 for outliers and 1 for inliers
         """
-        metric = Metric(name=metric_name, labels=metric_obj.get('labels'))
+        metric = Metric(name=metric_name, labels=metric_info.get('labels'))
         model = self.predictor_model(metric)
 
-        return model.predict(pd.DataFrame(data=[metric_obj]))
+        return model.predict(pd.DataFrame(data=[metric_info]))
 
     def _parse(self, path: str) -> t.List[Metric]:
         """ Parse a json file from `path` and create a list of Metric objects """
