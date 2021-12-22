@@ -27,7 +27,7 @@ $ docker-compose up
 
 Starting with the `docker-compose.yml` file, we can see that this application is split into a main webapp service and the scheduling service (`celery` in this case).
 
-The metrics collection is done mainly by the `celery` workers. The `webserver` service providing only a way of pushing metrics from external service (when scheduling is not feasible).
+The metrics collection is done mainly by the `celery` workers. The `metrics_web` service providing only a way of pushing metrics from external service (when scheduling is not feasible).
 
 ### Metric collection
 
@@ -43,11 +43,11 @@ To enable anomaly detection on a given metric, first you have to add it into `re
 
 The json file can have the following fields:
 
-`name`: required, the name of the metric
+`name`: _required_, the name of the metric
 
-`train_params`: optional, a dictionary that will be passed as parameters to the training model
+`train_params`: _optional_, a dictionary that will be passed as parameters to the training model
 
-`train_interval`: optional, a dictionary that will be passed as parameters to a timedelta object. This interval is used for data selection before running the training process.
+`train_interval`: _optional_, a dictionary that will be passed as parameters to a timedelta object. This interval is used for data selection before running the training process.
 
 The `components.anomaly_detector.Detector` class acts as a Facade for the actual model inside `components.anomaly_models` module. The detector can only use a single prediction model and it has the role of collecting the metrics from the `detetection_metrics.json` file and running the training and prediction processes for every metric it finds.
 
@@ -63,10 +63,33 @@ A metric_info object is a dictionary that contains the fields: `labels`, `value`
 
 The collector will be tasked with storing the prediction result inside the metric before sending it to the storage.
 
+### Push metrics manually
 
+Scheduling collectors is the main way of gathering metrics data, but when this is not possible, a manual push mechanism is available in the `metrics_web` service.
 
+The push mechanism has only one endpoint:
 
+_URL:_ `/push`
 
+_Method:_ `POST`
 
+_Body:_
 
+- `name`: _required_, metric name
+- `value`: _required_, the metric value
+- `labels`: _optional_, a labels dictionary to better describe the entry
 
+The new entry will be added with timestamp `datetime.now()`.
+
+#### Example:
+
+`POST localhost:5000/push`
+
+Body:
+```
+{
+    "name": "metric_name",
+    "labels": {"label1": "value1"}
+    "value": 123
+}
+```
