@@ -23,7 +23,7 @@ class MongoStorage(BaseStorage):
     def store_metric(self,
             collection: str,
             value: float,
-            labels: t.Dict[str, str],
+            labels: t.Optional[t.Dict[str, str]] = None,
             timestamp: t.Optional[datetime] = None) -> None:
         """ Store a new metrics instance into MongoDB storage system """
         timestamp = timestamp or datetime.now()
@@ -33,21 +33,24 @@ class MongoStorage(BaseStorage):
                 timeseries={'timeField': 'timestamp', 'metaField': 'labels'})
 
         self.db[collection].insert_one({
-            'timestamp': timestamp.isoformat(),
-            'labels': labels,
+            'timestamp': timestamp,
+            'labels': labels or {},
             'value': value
         })
 
     def get_distinct_in_range(self, collection: str, start: datetime) -> t.Dict[str, t.Any]:
         """ Select distinct labels starting from a given timestamp """
-        return self.db[collection].distinct('labels', {'timestamp': {'$gte': start.isoformat()}})
+        return self.db[collection].distinct('labels', {'timestamp': {'$gte': start}})
 
-    def get_metric_data_by_labels(self,
+    def get_metric_data(self,
             collection: str,
-            labels: t.Dict[str, str],
-            start: datetime) -> t.Dict[str, t.Any]:
-        """ Select documents starting from an optional `start` date filtered by `labels` """
-        find_params = {'labels': labels, 'timestamp': {'$gte': start.isoformat()}}
+            start: datetime,
+            labels: t.Optional[t.Dict[str, str]] = None) -> t.Dict[str, t.Any]:
+        """ Select documents starting from a `start` date optionally filtered by `labels` """
+        find_params = {'timestamp': {'$gte': start}}
+
+        if labels:
+            find_params['labels'] = labels
 
         print('findparams', find_params)
 

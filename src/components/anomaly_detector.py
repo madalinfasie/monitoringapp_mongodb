@@ -10,12 +10,10 @@ from components.data_classes import Metric
 
 
 class Detector:
-    def __init__(self,
-            predictor_model: ad_models.Model,
-            storage: storage.BaseStorage):
+    def __init__(self, predictor_model: ad_models.Model = ad_models.IForestModel):
         self.predictor_model = predictor_model
         self.metrics_path = settings.DETECTION_METRICS_PATH
-        self.storage = storage
+        self.storage = storage.MongoStorage()
 
         self._metrics = None
 
@@ -29,39 +27,29 @@ class Detector:
     def train(self) -> None:
         """ Run the training process for all the metrics in the detection metrics file """
         for metric in self.metrics:
+            print(f'[TRAIN] Training metric {metric}')
             distinct_labels = self.storage.get_distinct_in_range(
                 collection=metric.name,
                 start=datetime.now() - timedelta(**metric.train_interval))
 
+            print(f'[TRAIN] Distinct labels for the metric {metric}: {distinct_labels}')
+            if not distinct_labels:
+                self._train_metric(metric)
+                continue
+
             for labels in distinct_labels:
                 metric.labels = labels
-                model = self.predictor_model(metric)
+                self._train_metric(metric)
 
-                data = self.storage.get_metric_data_by_labels(
-                    collection=metric.name,
-                    labels=metric.labels,
-                    start=datetime.now() - timedelta(**metric.train_interval))
-
-                data = tuple(data)
-                if not data:
-                    print('WARNING! No data found for metric', metric)
-                    continue
-
-                model.train(pd.DataFrame(data=data))
-
-    def predict(self, data: t.Dict[str, t.Any]) -> None:
+    def predict(self, metric_name, metric_obj: t.Dict[str, t.Any]) -> int:
         """ Run predictions for all the metrics in the detection metrics file.
 
-        This method will add the detected values to the storage system
+        Returns: -1 for outliers and 1 for inliers
         """
-        metric = Metric(name=data['name'], labels=data['labels'])
+        metric = Metric(name=metric_name, labels=metric_obj.get('labels'))
         model = self.predictor_model(metric)
 
-        data = {
-            'timestamp': [data['timestamp']],
-            'value': [data['value']]
-        }
-        return model.predict(pd.DataFrame(data=data))[0]
+        return model.predict(pd.DataFrame(data=[metric_obj]))
 
     def _parse(self, path: str) -> t.List[Metric]:
         """ Parse a json file from `path` and create a list of Metric objects """
@@ -69,3 +57,19 @@ class Detector:
             json_metrics = json.load(f)
 
         return [Metric(**data) for data in json_metrics]
+
+    def _train_metric(self, metric: Metric) -> None:
+        """ Run the training process for a given metric """
+        model = self.predictor_model(metric)
+
+        data = self.storage.get_metric_data(
+            collection=metric.name,
+            labels=metric.labels,
+            start=datetime.now() - timedelta(**metric.train_interval))
+
+        data = tuple(data)
+        if not data:
+            print('WARNING! No data found for metric', metric)
+            return
+
+        model.train(pd.DataFrame(data=data))

@@ -23,7 +23,7 @@ services:
     env_file: ./src/.env
     volumes:
       - ./src:/code
-    command: ['celery', '-A', 'tasks.celery.app', worker, '-l', 'info']
+    command: ['celery', '-A', 'tasks.celery.app', worker, '-l', 'info', '--concurrency', '2']
     depends_on:
       - broker
   broker:

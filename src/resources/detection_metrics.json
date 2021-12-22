@@ -1,6 +1,11 @@
 [
     {
-        "name": "published_articles",
+        "name": "random_metric_with_prediction",
+        "train_params": {},
+        "train_interval": {"days": 7}
+    },
+    {
+        "name": "published_articles_last_hour",
         "train_params": {},
         "train_interval": {"days": 7}
     }

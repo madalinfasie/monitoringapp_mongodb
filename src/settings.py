@@ -16,3 +16,5 @@ CELERY_IMPORTS = ("tasks.tasks", )
 # Application settings
 DETECTION_METRICS_PATH = os.path.join(BASE_DIR, 'resources', 'detection_metrics.json')
 MODELS_PATH = os.path.join(BASE_DIR, 'models')
+DEVTO_API_KEY_NAME = os.getenv('DEVTO_API_KEY_NAME')
+DEVTO_API_KEY_VALUE = os.getenv('DEVTO_API_KEY_VALUE')

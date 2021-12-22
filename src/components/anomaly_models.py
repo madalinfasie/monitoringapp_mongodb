@@ -1,6 +1,5 @@
 import abc
 import pathlib
-from datetime import datetime
 
 import joblib
 import pandas as pd
@@ -10,13 +9,17 @@ import settings
 from components.data_classes import Metric
 
 
+class ModelDoesNotExistError(Exception):
+    pass
+
+
 class Model(abc.ABC):
     model_name: str = ''
 
-    def train(self, data: pd.DataFrame) -> None:
+    def train(self, df: pd.DataFrame) -> None:
         pass
 
-    def predict(self, timestamp: datetime) -> pd.DataFrame:
+    def predict(self, df: pd.DataFrame) -> int:
         pass
 
 
@@ -26,9 +29,6 @@ class IForestModel(Model):
     def __init__(self, metric: Metric) -> None:
         self.metric = metric
         self._model_path = None
-        pd.set_option('display.max_rows', 500)
-        pd.set_option('display.max_columns', 500)
-        pd.set_option('display.width', 1000)
 
     @property
     def model_path(self):
@@ -37,21 +37,21 @@ class IForestModel(Model):
 
         return self._model_path
 
-    def train(self, data: pd.DataFrame) -> None:
+    def train(self, df: pd.DataFrame) -> None:
         """ Train a given dataset """
-        data = data[['timestamp', 'value']]
-        data = self._split_timestamp_in_features(data)
+        df = df[['timestamp', 'value']]
+        df = self._split_timestamp_in_features(df)
         model = IsolationForest(n_estimators=10, warm_start=True)
-        model.fit(data)
+        model.fit(df)
 
         self._save_model(model)
 
-    def predict(self, data: pd.DataFrame) -> pd.DataFrame:
-        """ Predict the data """
-        data = self._split_timestamp_in_features(data)
+    def predict(self, df: pd.DataFrame) -> int:
+        """ Predict the df """
+        df = df[['timestamp', 'value']]
+        df = self._split_timestamp_in_features(df)
         model = self._load_model()
-        forecast = model.predict(data)
-        return forecast
+        return int(model.predict(df)[0])
 
     def _build_model_path(self):
         """ Build the path and the name of the model file """
@@ -62,18 +62,18 @@ class IForestModel(Model):
         )
 
     def _split_timestamp_in_features(self,
-            data: pd.DataFrame,
+            df: pd.DataFrame,
             column: str = 'timestamp') -> None:
         """ Split the time column from dataframe into separate features """
-        data = data.copy()
-        data[column] = pd.to_datetime(data[column])
-        data.set_index(column, drop=True, inplace=True)
-        data['day'] = [i.day for i in data.index]
-        data['day_of_year'] = [i.dayofyear for i in data.index]
-        data['week_of_year'] = [i.weekofyear for i in data.index]
-        data['hour'] = [i.hour for i in data.index]
-        data['is_weekday'] = [i.isoweekday() for i in data.index]
-        return data
+        df = df.copy()
+        df[column] = pd.to_datetime(df[column])
+        df.set_index(column, drop=True, inplace=True)
+        df['day'] = [i.day for i in df.index]
+        df['day_of_year'] = [i.dayofyear for i in df.index]
+        df['week_of_year'] = [i.weekofyear for i in df.index]
+        df['hour'] = [i.hour for i in df.index]
+        df['is_weekday'] = [i.isoweekday() for i in df.index]
+        return df
 
     def _save_model(self, model) -> None:
         """ Save the given model into a file """
@@ -86,4 +86,7 @@ class IForestModel(Model):
     def _load_model(self):
         """ Load a previously saved model based on the metric attributes """
         models_path = pathlib.Path(settings.MODELS_PATH)
-        return joblib.load(str(models_path / self._build_model_path()))
+        try:
+            return joblib.load(str(models_path / self._build_model_path()))
+        except FileNotFoundError as e:
+            raise ModelDoesNotExistError(e)

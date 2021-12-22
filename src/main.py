@@ -8,20 +8,8 @@ app = flask.Flask(__name__)
 
 @app.route('/test')
 def test():
-    from components import anomaly_detector as ad
-    from components import anomaly_models as ad_models
-    from datetime import datetime
-    detector = ad.Detector(ad_models.IForestModel, storage=storage.MongoStorage())
-    print('------------- TRAINING STARTED')
-    detector.train()
-    print('------------- TRAINING FINISHED')
-    print(detector.predict(
-        {
-            'name': 'published_articles',
-            'timestamp': datetime.now().isoformat(),
-            'value': 10,
-            'labels': {'user': 'ion'}
-        }))
+    from tasks import tasks
+    tasks.run_training()
     return 'Success'
 
 
