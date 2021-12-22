@@ -41,7 +41,7 @@ class IForestModel(Model):
         """ Train a given dataset """
         df = df[['timestamp', 'value']]
         df = self._split_timestamp_in_features(df)
-        model = IsolationForest(n_estimators=10, warm_start=True)
+        model = IsolationForest(warm_start=True, **self.metric.train_params)
         model.fit(df)
 
         self._save_model(model)
