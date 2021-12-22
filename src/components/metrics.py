@@ -78,12 +78,12 @@ def collect_fresh_published_articles_devto() -> None:
     result = requests.get(url)
     result.raise_for_status()
 
-    articles_last_hour = len([0 for obj in result.json()
-        if obj['published_at'] > (datetime.now() - timedelta(hours=1)).isoformat()])
+    articles_last_period = len([0 for obj in result.json()
+        if obj['published_at'] > (datetime.now() - timedelta(minutes=15)).isoformat()])
 
     # Run predictions and store the metric value
     metric_info = _apply_prediction(
-        name='published_articles_last_hour',
-        value=articles_last_hour)
+        name='published_articles_last_15_mins',
+        value=articles_last_period)
 
     metric_storage.store_metric(**metric_info)

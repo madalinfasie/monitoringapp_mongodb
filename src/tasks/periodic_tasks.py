@@ -20,6 +20,6 @@ SCHEDULES = {
     'collect_fresh_published_articles_devto': {
         'task': 'tasks.tasks.collect',
         'kwargs': {'collector': 'collect_fresh_published_articles_devto'},
-        'schedule': timedelta(hours=1)
+        'schedule': timedelta(minutes=15)
     }
 }
