@@ -1,0 +1,7 @@
+[
+    {
+        "name": "published_articles",
+        "train_params": {},
+        "train_interval": {"days": 7}
+    }
+]

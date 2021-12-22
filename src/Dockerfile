@@ -4,8 +4,6 @@ LABEL maintainer="Madalin Fasie"
 
 ARG CODE=/code
 
-# set environment variables
-
 # Make base folder for the source code
 RUN mkdir ${CODE}
 
@@ -24,7 +22,8 @@ COPY . ${CODE}
 WORKDIR ${CODE}
 
 # Install the python packages
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
 
 # Expose the port
 EXPOSE 5000

@@ -1,5 +1,6 @@
 __pycache__/
 .vscode/
+models/
 
 .env
 .broker_env
