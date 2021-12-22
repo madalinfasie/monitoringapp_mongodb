@@ -23,6 +23,7 @@ def collect(collector: str, args=None, kwargs=None) -> None:
 
 @app.task
 def run_training() -> None:
+    """ Run the anomaly detection training """
     detector = ad.Detector(ad_models.IForestModel)
     print('Starting metrics training')
     start = time.time()
