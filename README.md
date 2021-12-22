@@ -53,6 +53,8 @@ The `components.anomaly_detector.Detector` class acts as a Facade for the actual
 
 The training process is scheduled and run by the `celery beat` the same as the collectors.
 
+The models will be saved on disk named after the template: `{metric_name}_{model_name}_{metric_labels}.joblib`. For prediction, the same pattern will be used to search for available models, so in order for a prediction to be made, you have to be sure a model exists for that particular model-metric-labels configuration.
+
 #### Prediction
 
 To get a prediction, one can use `components.anomaly_detector.Detector.predict` method which receives a metric name and a metric_info dictionary and returns `-1` for outliers and `1` for inliers.
