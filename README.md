@@ -61,6 +61,9 @@ _URL:_ `/push`
 
 _Method:_ `POST`
 
+_Example:_ `GET localhost:5000/anomaly-detection/train`
+
+
 #### Prediction
 
 To get a prediction, one can use `components.anomaly_detector.Detector.predict` method which receives a metric name and a metric_info dictionary and returns `-1` for outliers and `1` for inliers.
@@ -75,13 +78,9 @@ Scheduling collectors is the main way of gathering metrics data, but when this i
 
 The push mechanism has only one endpoint:
 
-_URL:_ `/anomaly-detection/train`
+_URL:_ `/push`
 
-_Method:_ `GET`
-
-#### Example:
-
-`GET localhost:5000/anomaly-detection/train`
+_Method:_ `POST`
 
 _Body:_
 
