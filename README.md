@@ -102,3 +102,11 @@ Body:
     "value": 123
 }
 ```
+
+## Visualization
+
+To visualize the metrics data, tools such as Mongo Charts or Grafana can be used.
+
+To do that, create a data source using the tool of your choice pointing to the MongoDb database that holds all the metrics and then create the graphs.
+
+_Note:_ Currently, Grafana supports MongoDb only with paid subscription.
