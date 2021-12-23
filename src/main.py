@@ -6,11 +6,11 @@ from components import storage
 app = flask.Flask(__name__)
 
 
-@app.route('/test')
-def test():
+@app.route('/anomaly-detection/train')
+def manual_training():
     from tasks import tasks
-    tasks.run_training()
-    return 'Success'
+    tasks.run_training.delay()
+    return 'Training request has been sent'
 
 
 @app.route('/push', methods=['POST'])
