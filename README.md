@@ -55,6 +55,12 @@ The training process is scheduled and run by the `celery beat` the same as the c
 
 The models will be saved on disk named after the template: `{metric_name}_{model_name}_{metric_labels}.joblib`. For prediction, the same pattern will be used to search for available models, so in order for a prediction to be made, you have to be sure a model exists for that particular model-metric-labels configuration.
 
+You can also run manual training through an API endpoint from `metrics_web` service:
+
+_URL:_ `/push`
+
+_Method:_ `POST`
+
 #### Prediction
 
 To get a prediction, one can use `components.anomaly_detector.Detector.predict` method which receives a metric name and a metric_info dictionary and returns `-1` for outliers and `1` for inliers.
@@ -69,9 +75,13 @@ Scheduling collectors is the main way of gathering metrics data, but when this i
 
 The push mechanism has only one endpoint:
 
-_URL:_ `/push`
+_URL:_ `/anomaly-detection/train`
 
-_Method:_ `POST`
+_Method:_ `GET`
+
+#### Example:
+
+`GET localhost:5000/anomaly-detection/train`
 
 _Body:_
 
