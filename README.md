@@ -4,6 +4,8 @@
 
 Schedule metrics collectors for different services and run anomaly detection on new values.
 
+This app has been developed for the MongoDB Hackathon on Dev.to and won the [runner-up prize](https://dev.to/devteam/congrats-to-the-mongodb-atlas-hackathon-winners-4cc0).
+
 ## Getting started
 
 ### Prerequisites
